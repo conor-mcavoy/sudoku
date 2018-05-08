@@ -11,12 +11,18 @@ class Col:
         """Adds one element to the Col."""
         self.numbers.append(number)
 
+    def get_numbers(self):
+        return self.numbers
+
 class Row:
     def __init__(self, numbers):
         self.numbers = [n for n in numbers]
 
     def __str__(self):
         return ''.join(self.numbers)
+
+    def get_numbers(self):
+        return self.numbers
 
 class Box:
     def __init__(self, first_three):
@@ -25,6 +31,9 @@ class Box:
     def add(self, three_elements):
         """Adds three elements to the Box."""
         self.numbers.extend(three_elements)
+
+    def get_numbers(self):
+        return self.numbers
 
 class Grid:
     def __init__(self):
@@ -42,6 +51,33 @@ class Grid:
 
     def add_boxes(self, boxes):
         self.boxes.extend(boxes)
+
+    def solve(self, limit=1000):
+        loop_counter = 0
+        while not self.check_solved() and loop_counter < limit:
+            self.simple_fills()
+            loop_counter += 1
+
+    def simple_fills(self):
+        pass
+
+    def check_solved(self):
+        all_numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+        for col in self.cols:
+            if sorted(col.get_numbers()) != all_numbers:
+                return False
+            
+        for row in self.rows:
+            if sorted(row.get_numbers()) != all_numbers:
+                return False
+
+        for box in self.boxes:
+            if sorted(box.get_numbers()) != all_numbers:
+                return False
+
+        return True
+
+        
 
 
 
@@ -91,7 +127,8 @@ def main():
                 
         g.add_cols(all_cols)
 
-    print(g)
+    #g.solve()
+    print(g.check_solved())
             
 
 
