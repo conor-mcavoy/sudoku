@@ -7,6 +7,12 @@ class Col:
     def __init__(self):
         self.numbers = []
 
+    def __getitem__(self, key):
+        return self.numbers[key]
+
+    def __setitem__(self, key, value):
+        self.numbers[key] = value
+
     def add(self, number):
         """Adds one element to the Col."""
         self.numbers.append(number)
@@ -21,12 +27,24 @@ class Row:
     def __str__(self):
         return ''.join(self.numbers)
 
+    def __getitem__(self, key):
+        return self.numbers[key]
+
+    def __setitem__(self, key, value):
+        self.numbers[key] = value
+
     def get_numbers(self):
         return self.numbers
 
 class Box:
     def __init__(self, first_three):
         self.numbers = [n for n in first_three]
+
+    def __getitem__(self, key):
+        return self.numbers[key]
+
+    def __setitem__(self, key, value):
+        self.numbers[key] = value
 
     def add(self, three_elements):
         """Adds three elements to the Box."""
@@ -59,8 +77,51 @@ class Grid:
             loop_counter += 1
 
     def simple_fills(self):
-        pass
+        col_num = 0
+        for col in self.cols:
+            if col.get_numbers().count('0') == 1:
+                missing_num = str(45 - sum(map(int, col.get_numbers())))
+                self.update_col(col_num, col.get_numbers().index('0'),
+                                missing_num)
+            col_num += 1
 
+        row_num = 0
+        for row in self.rows:
+            if row.get_numbers().count('0') == 1:
+                missing_num = str(45 - sum(map(int, row.get_numbers())))
+                self.update_row(row_num, row.get_numbers().index('0'),
+                                missing_num)
+            row_num += 1
+
+        
+
+    def update_col(self, col_num, col_pos, new_num):
+        if self.cols[col_num][col_pos] == new_num:
+            return
+        self.cols[col_num][col_pos] = new_num
+        self.update_row(col_pos, col_num, new_num)
+        box_num = 3*(col_pos // 3) + col_num // 3
+        box_pos = 3*(col_pos % 3) + col_num % 3
+        self.update_box(box_num, box_pos, new_num)
+
+    def update_row(self, row_num, row_pos, new_num):
+        if self.rows[row_num][row_pos] == new_num:
+            return
+        self.update_col(row_pos, row_num, new_num)
+        self.rows[row_num][row_pos] = new_num
+        box_num = 3*(row_num // 3) + row_pos // 3
+        box_pos = 3*(row_num % 3) + row_pos % 3
+        self.update_box(box_num, box_pos, new_num)
+
+    def update_box(self, box_num, box_pos, new_num):
+        if self.boxes[box_num][box_pos] == new_num:
+            return
+        col_num = 3*(box_num % 3) + box_pos % 3
+        col_pos = 3*(box_num // 3) + box_pos // 3
+        self.update_col(col_num, col_pos, new_num)
+        self.update_row(col_pos, col_num, new_num)
+        self.boxes[box_num][box_pos] = new_num
+            
     def check_solved(self):
         all_numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
         for col in self.cols:
@@ -127,8 +188,9 @@ def main():
                 
         g.add_cols(all_cols)
 
-    #g.solve()
+    g.solve()
     print(g.check_solved())
+    print(g)
             
 
 
