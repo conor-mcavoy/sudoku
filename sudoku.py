@@ -21,25 +21,6 @@ class Col:
     def get_numbers(self):
         return self.numbers
 
-    
-class Row:
-    def __init__(self, numbers):
-        self.numbers = [n for n in numbers]
-
-    def __str__(self):
-        return '|' +  ''.join(self.numbers[:3]) + '|' \
-            + ''.join(self.numbers[3:6]) + '|' \
-            + ''.join(self.numbers[6:]) + '|'
-
-    def __getitem__(self, key):
-        return self.numbers[key]
-
-    def __setitem__(self, key, value):
-        self.numbers[key] = value
-
-    def get_numbers(self):
-        return self.numbers
-
 class Box:
     def __init__(self, first_three):
         self.numbers = [n for n in first_three]
