@@ -75,26 +75,23 @@ class Grid:
                                       - set(self.boxes[3*(row_num//3)
                                                        + col_num//3])
                     if len(possible_values) == 1:
-                        self.update_row(row_num, col_num,
-                                        possible_values.pop())
+                        self.update_row(row_num, col_num, possible_values.pop())
             
             loop_counter += 1
 
     def simple_fills(self):
         col_num = 0
         for col in self.cols:
-            if col.get_numbers().count('0') == 1:
-                missing_num = str(45 - sum(map(int, col.get_numbers())))
-                self.update_col(col_num, col.get_numbers().index('0'),
-                                missing_num)
+            if col.count('0') == 1:
+                missing_num = str(45 - sum(map(int, col)))
+                self.update_col(col_num, col.index('0'), missing_num)
             col_num += 1
 
         row_num = 0
         for row in self.rows:
             if row.count('0') == 1:
                 missing_num = str(45 - sum(map(int, row)))
-                self.update_row(row_num, row.index('0'),
-                                missing_num)
+                self.update_row(row_num, row.index('0'), missing_num)
             row_num += 1
 
         box_num = 0
@@ -104,8 +101,6 @@ class Grid:
                 self.update_box(box_num, box.get_numbers().index('0'),
                                 missing_num)
             box_num += 1
-
-        
 
     def update_col(self, col_num, col_pos, new_num):
         if self.cols[col_num][col_pos] == new_num:
@@ -140,7 +135,7 @@ class Grid:
     def check_solved(self):
         all_numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
         for col in self.cols:
-            if sorted(col.get_numbers()) != all_numbers:
+            if sorted(col) != all_numbers:
                 return False
             
         for row in self.rows:
@@ -153,9 +148,6 @@ class Grid:
 
         return True
 
-        
-
-
 
 def main():
     parser = argparse.ArgumentParser(description="Solve sudoku puzzles.")
@@ -167,21 +159,12 @@ def main():
     g = Grid()
     with open(filename, 'r') as f:
         line_count = 0
-        col1 = Col()
-        col2 = Col()
-        col3 = Col()
-        col4 = Col()
-        col5 = Col()
-        col6 = Col()
-        col7 = Col()
-        col8 = Col()
-        col9 = Col()
-        all_cols = [col1, col2, col3, col4, col5, col6, col7, col8, col9]
+        all_cols = [[] for _ in range(9)]
         
         for line in f:
             i = 0
             for col in all_cols:
-                col.add(line[i])
+                col.append(line[i])
                 i += 1
             
             g.add_row(list(line[:9]))
