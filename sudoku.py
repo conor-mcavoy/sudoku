@@ -4,23 +4,6 @@
 import argparse
 
 
-class Col:
-    def __init__(self):
-        self.numbers = []
-
-    def __getitem__(self, key):
-        return self.numbers[key]
-
-    def __setitem__(self, key, value):
-        self.numbers[key] = value
-
-    def add(self, number):
-        """Adds one element to the Col."""
-        self.numbers.append(number)
-
-    def get_numbers(self):
-        return self.numbers
-
 class Box:
     def __init__(self, first_three):
         self.numbers = [n for n in first_three]
