@@ -3,6 +3,7 @@
 
 import argparse
 
+
 class Col:
     def __init__(self):
         self.numbers = []
@@ -20,12 +21,15 @@ class Col:
     def get_numbers(self):
         return self.numbers
 
+    
 class Row:
     def __init__(self, numbers):
         self.numbers = [n for n in numbers]
 
     def __str__(self):
-        return ''.join(self.numbers)
+        return '|' +  ''.join(self.numbers[:3]) + '|' \
+            + ''.join(self.numbers[3:6]) + '|' \
+            + ''.join(self.numbers[6:]) + '|'
 
     def __getitem__(self, key):
         return self.numbers[key]
@@ -53,13 +57,15 @@ class Box:
     def get_numbers(self):
         return self.numbers
 
+    
 class Grid:
     def __init__(self):
         self.rows = []
         self.boxes = []
+        self.updated = False
 
     def __str__(self):
-        return '\n'.join(str(row) for row in self.rows)
+        return '\n'.join(''.join(row) for row in self.rows)
 
     def add_cols(self, cols):
         self.cols = cols
@@ -73,7 +79,24 @@ class Grid:
     def solve(self, limit=1000):
         loop_counter = 0
         while not self.check_solved() and loop_counter < limit:
+            self.updated = False
             self.simple_fills()
+            if self.updated:
+                continue
+
+            for row_num in range(9):
+                for col_num in range(9):
+                    if self.rows[row_num][col_num] != '0':
+                        continue
+                    possible_values = {str(i) for i in range(1, 10)} \
+                                      - set(self.cols[col_num]) \
+                                      - set(self.rows[row_num]) \
+                                      - set(self.boxes[3*(row_num//3)
+                                                       + col_num//3])
+                    if len(possible_values) == 1:
+                        self.update_row(row_num, col_num,
+                                        possible_values.pop())
+            
             loop_counter += 1
 
     def simple_fills(self):
@@ -87,11 +110,19 @@ class Grid:
 
         row_num = 0
         for row in self.rows:
-            if row.get_numbers().count('0') == 1:
-                missing_num = str(45 - sum(map(int, row.get_numbers())))
-                self.update_row(row_num, row.get_numbers().index('0'),
+            if row.count('0') == 1:
+                missing_num = str(45 - sum(map(int, row)))
+                self.update_row(row_num, row.index('0'),
                                 missing_num)
             row_num += 1
+
+        box_num = 0
+        for box in self.boxes:
+            if box.get_numbers().count('0') == 1:
+                missing_num = str(45 - sum(map(int, box.get_numbers())))
+                self.update_box(box_num, box.get_numbers().index('0'),
+                                missing_num)
+            box_num += 1
 
         
 
@@ -103,6 +134,7 @@ class Grid:
         box_num = 3*(col_pos // 3) + col_num // 3
         box_pos = 3*(col_pos % 3) + col_num % 3
         self.update_box(box_num, box_pos, new_num)
+        self.updated = True
 
     def update_row(self, row_num, row_pos, new_num):
         if self.rows[row_num][row_pos] == new_num:
@@ -112,6 +144,7 @@ class Grid:
         box_num = 3*(row_num // 3) + row_pos // 3
         box_pos = 3*(row_num % 3) + row_pos % 3
         self.update_box(box_num, box_pos, new_num)
+        self.updated = True
 
     def update_box(self, box_num, box_pos, new_num):
         if self.boxes[box_num][box_pos] == new_num:
@@ -121,6 +154,7 @@ class Grid:
         self.update_col(col_num, col_pos, new_num)
         self.update_row(col_pos, col_num, new_num)
         self.boxes[box_num][box_pos] = new_num
+        self.updated = True
             
     def check_solved(self):
         all_numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -129,7 +163,7 @@ class Grid:
                 return False
             
         for row in self.rows:
-            if sorted(row.get_numbers()) != all_numbers:
+            if sorted(row) != all_numbers:
                 return False
 
         for box in self.boxes:
@@ -169,8 +203,7 @@ def main():
                 col.add(line[i])
                 i += 1
             
-            row = Row(line[0:9])
-            g.add_row(row)
+            g.add_row(list(line[:9]))
 
             if line_count % 3 == 0:
                 box1 = Box(line[0:3])
@@ -189,9 +222,10 @@ def main():
         g.add_cols(all_cols)
 
     g.solve()
-    print(g.check_solved())
-    print(g)
-            
+    if g.check_solved():
+        print(g)
+    else:
+        print("Unable to solve after 1000 iterations.")
 
 
 if __name__ == "__main__":
