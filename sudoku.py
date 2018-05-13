@@ -173,6 +173,7 @@ def main():
         print(g)
     else:
         print("Unable to solve after 1000 iterations.")
+        print(g)
 
 
 if __name__ == "__main__":
